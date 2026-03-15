@@ -1,0 +1,71 @@
+from manim import *
+
+class Move(Scene):
+    def construct(self):
+        # Texto inicial centralizado
+        referential_text = Text("Referencial I", font_size=48, color=YELLOW)
+
+        # Criar o título "1º POSTULADO"
+        title = Text("1º POSTULADO", font_size=48, color=YELLOW).to_edge(UP)
+
+        # Criar os trilhos (duas linhas brancas)
+        track1 = Line(start=LEFT * 14, end=RIGHT * 14, stroke_width=4, color=WHITE).shift(DOWN * 1.5)
+        track2 = Line(start=LEFT * 14, end=RIGHT * 14, stroke_width=4, color=WHITE).shift(DOWN * 2)
+
+        # Adicionar árvores ao fundo
+        tree1 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(UP * 2)
+        tree2 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(RIGHT * 4 + UP * 1.5)
+        tree3 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(RIGHT * 8 + UP * 2)
+        tree4 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(RIGHT * 12 + UP * 1.5)
+
+        # Carregar e centralizar o trem
+        train = SVGMobject("train.svg").scale(2)
+
+        # Adicionar o texto inicial
+        self.play(FadeIn(referential_text))
+        self.wait(2)
+        self.play(FadeOut(referential_text))
+
+        # Adicionar os elementos fixos à cena
+        self.add(track1, track2, train, tree1, tree2, tree3, tree4)
+
+        # Exibir o título
+        self.play(FadeIn(title))
+        self.wait(2)
+        self.play(FadeOut(title))
+
+        # Origem da luz (esquerda e direita)
+        origem_esquerda = Dot(point=LEFT * 6 + DOWN * 1.5, color=WHITE)
+        origem_direita = Dot(point=RIGHT * 6 + DOWN * 1.5, color=WHITE)
+
+        self.add(origem_esquerda, origem_direita)
+
+        # Nome "LUZ" próximo aos pontos
+        luz_texto_esquerda = Text("LUZ", font_size=24, color=BLUE).next_to(origem_esquerda, UP, buff=0.2)
+        luz_texto_direita = Text("LUZ", font_size=24, color=BLUE).next_to(origem_direita, UP, buff=0.2)
+
+        self.add(luz_texto_esquerda, luz_texto_direita)
+
+        # Pulso de luz esférico à esquerda
+        luz_esferica_esquerda = Circle(
+            radius=0.25, color=WHITE, fill_opacity=0.3
+        ).move_to(origem_esquerda.get_center())
+
+        # Pulso de luz esférico à direita
+        luz_esferica_direita = Circle(
+            radius=0.5, color=WHITE, fill_opacity=0.3
+        ).move_to(origem_direita.get_center())
+
+        # Adicionar os círculos
+        self.add(luz_esferica_esquerda, luz_esferica_direita)
+
+        # Animação de expansão
+        self.play(
+            luz_esferica_esquerda.animate.scale(12),
+            luz_esferica_direita.animate.scale(12),
+            run_time=3,
+            rate_func=linear,  # Expansão uniforme
+        )
+
+        # Final da cena
+        self.wait(4)
