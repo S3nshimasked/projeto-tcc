@@ -1,0 +1,104 @@
+from manim import *
+import random  # Para o fundo de estrelas
+
+class SegundoPostulado(MovingCameraScene):
+    def construct(self):
+        # Fundo com estrelas
+        stars = self.create_starry_background()
+        self.add(stars)
+
+        # Título "2° POSTULADO" no topo centralizado e amarelo
+        titulo = Text("2° POSTULADO", color=YELLOW).scale(1).to_edge(UP)
+        self.play(FadeIn(titulo))  # Título entra com FadeIn
+        self.wait(1)
+
+        # Observadores
+        man = SVGMobject("man1.svg").scale(0.5).move_to([-4.0, 0, 0])  # Man movido 0.5 unidades à direita
+        rocket = SVGMobject("rocket1.svg").scale(0.5).to_edge(LEFT).shift(UP * 2)
+
+        # Ajusta o foguete para ficar horizontal
+        rocket.rotate(-PI / 4)  # Rotaciona para alinhamento horizontal
+
+        # Posições para os rótulos
+        origem_luz = Dot(color=YELLOW).move_to([-5, 0, 0])  # Posição da origem da luz
+        luz_label = Text("LUZ").scale(0.5).next_to(origem_luz, UP)  # Posicionado exatamente onde a luz começa
+
+        referencial_repouso_label = Text("Referencial em repouso").scale(0.5).next_to(man, DOWN).shift(DOWN * 0.2)  # Movido 0.2 unidades para baixo
+        
+        # Ajuste de posição do rótulo "Referencial em movimento" mais para a direita
+        referencial_movimento_label = Text("Referencial em movimento").scale(0.5).next_to(rocket, DOWN).shift(RIGHT * 1)
+
+        # Posicionar man, rocket, e rótulos na cena
+        self.play(FadeIn(man), FadeIn(rocket), FadeIn(luz_label))
+        self.play(FadeIn(referencial_repouso_label), FadeIn(referencial_movimento_label))
+
+        self.wait(2)
+
+        # Faz os rótulos desaparecerem suavemente
+        self.play(FadeOut(referencial_repouso_label), FadeOut(referencial_movimento_label))
+
+        self.wait(1)
+
+        # Ponto inicial da luz (bem à esquerda)
+        self.add(origem_luz)
+
+        # Pulso de luz esférico
+        luz_esferica = Circle(
+            radius=0.1, color=YELLOW, fill_opacity=0.3
+        ).move_to(origem_luz.get_center())
+        self.add(luz_esferica)
+
+        # Distância que o foguete vai percorrer
+        distancia_foguete = 10  # Distância do movimento do foguete
+
+        # Velocidade do foguete: 1 unidade por segundo
+        velocidade_foguete = 1  # m/s
+        tempo_foguete = distancia_foguete / velocidade_foguete  # Tempo para o foguete percorrer a distância
+
+        # Animação do foguete se movendo a 1 m/s
+        rocket_move = rocket.animate.shift(RIGHT * distancia_foguete)
+
+        # Animação da luz (expansão esférica)
+        luz_expandir = luz_esferica.animate.scale(100)
+
+        # Inicia as animações simultaneamente
+        self.play(
+            rocket_move,  # Movimento constante do foguete
+            luz_expandir,  # Luz se expandindo
+            run_time=tempo_foguete,  # O tempo da animação é baseado na velocidade do foguete
+            rate_func=linear
+        )
+
+        # Agora, verificamos quando o feixe de luz alcança o foguete
+        self.wait(0.5)
+
+        # Zoom na interação final, quando a luz atinge o foguete
+        self.camera.frame.save_state()
+
+        # Animações de zoom enquanto a luz continua se expandindo
+        self.play(
+            self.camera.frame.animate.scale(0.5).move_to(rocket.get_center()),
+            run_time=2
+        )
+
+        # Efeito final: explosão de luz
+        explosao = Circle(radius=2, color=RED, fill_opacity=0.8).move_to(rocket.get_center())
+        self.play(FadeIn(explosao, scale=2), run_time=1)
+
+        # Retorna ao estado inicial e exibe a cena inteira
+        self.play(
+            Restore(self.camera.frame),
+            run_time=2
+        )
+
+        self.wait(1)
+
+        # FadeOut para o título "2° POSTULADO" após a animação
+        self.play(FadeOut(titulo))
+        
+    def create_starry_background(self):
+        """Cria um fundo de estrelas."""
+        stars = VGroup(*[Dot(radius=0.01, color=WHITE).move_to(
+            [random.uniform(-7, 7), random.uniform(-4, 4), 0]
+        ) for _ in range(100)])
+        return stars
