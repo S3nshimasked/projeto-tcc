@@ -1,0 +1,99 @@
+from manim import *
+import random
+
+class Move(Scene):
+    def construct(self):
+        # Variável para rastrear o tempo acumulado
+        elapsed_time = 0
+
+        # Lista de momentos para os relâmpagos
+        lightning_times = [0.5, 2, 3.5, 5]
+
+        # Função para relâmpago (flash de luz)
+        def lightning():
+            self.camera.background_color = WHITE
+            self.wait(0.1)
+            self.camera.background_color = BLACK
+            self.wait(0.1)
+
+        # Título "1º POSTULADO"
+        title = Text("1º POSTULADO", font_size=48, color=YELLOW).to_edge(UP)
+
+        # Carregar a imagem do trem
+        train = SVGMobject("train.svg").scale(2)
+        
+        # Posicionar o trem inicialmente fora da tela à esquerda
+        train.shift(LEFT * 12)
+
+        # Criar os trilhos (duas linhas brancas)
+        track1 = Line(start=LEFT * 14, end=RIGHT * 14, stroke_width=4, color=WHITE).shift(DOWN * 1.5)
+        track2 = Line(start=LEFT * 14, end=RIGHT * 14, stroke_width=4, color=WHITE).shift(DOWN * 2)  # Segunda linha
+
+        # Carregar e posicionar algumas árvores no cenário
+        tree1 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(UP * 2)
+        tree2 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(RIGHT * 4 + UP * 1.5)
+        tree3 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(RIGHT * 8 + UP * 2)
+        tree4 = SVGMobject("tree.svg").set_height(1.5).to_edge(LEFT).shift(RIGHT * 12 + UP * 1.5)
+
+        # Carregar e posicionar nuvens inicialmente fora da tela à esquerda
+        cloud1 = SVGMobject("cloud.svg").set_height(1).shift(LEFT * 14 + UP * 3)
+        cloud2 = SVGMobject("cloud.svg").set_height(1).shift(LEFT * 10 + UP * 3.5)
+
+        # Carregar e posicionar o observador ("man") abaixo do trem
+        man = SVGMobject("boy.svg").set_height(1.5).shift(DOWN * 2)
+
+        # Adicionar todos os elementos à cena, incluindo os trilhos
+        self.add(tree1, tree2, tree3, tree4, track1, track2, train, cloud1, cloud2, man)
+
+        # Exibir o título "1º POSTULADO"
+        self.play(FadeIn(title))
+
+        # Aguardar um momento antes de ocultar o título
+        self.wait(2)
+
+        # Remover o título com FadeOut
+        self.play(FadeOut(title))
+
+        # Animação do trem e das nuvens até o ponto 0
+        train_stop = train.animate.shift(RIGHT * 12)
+        cloud1_stop = cloud1.animate.shift(RIGHT * 12)
+        cloud2_stop = cloud2.animate.shift(RIGHT * 12)
+
+        # Executar a animação inicial
+        self.play(
+            train_stop,
+            cloud1_stop,
+            cloud2_stop,
+            run_time=14,
+            rate_func=linear
+        )
+
+        # Adicionar o relógio sobre o trem ao parar
+        clock = SVGMobject("clock.svg").set_height(1).next_to(train, UP, buff=0.5)
+        self.add(clock)
+
+        # Executar os relâmpagos enquanto trem e nuvens estão parados
+        clock2 = SVGMobject("clock2.svg").set_height(0.6).next_to(man, UP, buff=0.5)
+
+        for i, time in enumerate(lightning_times):
+            self.wait(time - elapsed_time)
+            if i == 0:
+                self.add(clock2, clock2_label)
+            lightning()
+            elapsed_time = time
+
+        # Retomar o movimento do trem e das nuvens
+        train_resume = train.animate.shift(RIGHT * 14)
+        cloud1_resume = cloud1.animate.shift(RIGHT * 14)
+        cloud2_resume = cloud2.animate.shift(RIGHT * 14)
+
+        self.play(
+            train_resume,
+            cloud1_resume,
+            cloud2_resume,
+            run_time=14,
+            rate_func=linear
+        )
+
+        # Pausa final
+        self.wait
